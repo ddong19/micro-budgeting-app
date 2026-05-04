@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useBudget } from "../context/BudgetContext";
 import Character from "../components/Character";
@@ -38,8 +39,9 @@ export default function HomeScreen({ navigation }: Props) {
   const recentTransactions = budgetData.transactions.slice(0, 3);
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Character spendingPercentage={spendingPercentage} />
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <Character spendingPercentage={spendingPercentage} />
 
       <Card style={styles.card}>
         <Text style={styles.categoryName}>{budgetData.categoryName}</Text>
@@ -118,14 +120,18 @@ export default function HomeScreen({ navigation }: Props) {
           </View>
         )}
       </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: "#fff",
+  },
+  container: {
+    flex: 1,
   },
   content: {
     padding: 24,

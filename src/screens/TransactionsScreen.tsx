@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useBudget } from "../context/BudgetContext";
 import Card from "../components/ui/Card";
@@ -23,7 +24,7 @@ export default function TransactionsScreen({ navigation }: Props) {
   const { budgetData, deleteTransaction, totalSpent } = useBudget();
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <ScrollView contentContainerStyle={styles.content}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
@@ -81,12 +82,12 @@ export default function TransactionsScreen({ navigation }: Props) {
           </View>
         )}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: "#fff",
   },
