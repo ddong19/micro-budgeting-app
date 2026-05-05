@@ -6,11 +6,12 @@ interface ProgressBarProps {
 }
 
 function getProgressColor(percentage: number): string {
-  if (percentage < 30) return "#10b981"; // green
-  if (percentage < 60) return "#3b82f6"; // blue
-  if (percentage < 85) return "#f59e0b"; // yellow
-  if (percentage < 100) return "#ef4444"; // red
-  return "#7c3aed"; // purple
+  if (percentage < 25) return "#10b981";  // Thriving - bright green
+  if (percentage < 50) return "#86efac";  // Happy - light green
+  if (percentage < 65) return "#fde047";  // Nervous - yellow
+  if (percentage < 80) return "#fb923c";  // Worried - orange
+  if (percentage < 100) return "#f87171"; // Stressed - red
+  return "#78716c";                       // Ruined - brown/grey
 }
 
 export default function ProgressBar({ percentage }: ProgressBarProps) {
