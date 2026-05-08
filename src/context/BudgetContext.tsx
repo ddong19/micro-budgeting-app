@@ -8,18 +8,22 @@ export interface Transaction {
   date: string;
 }
 
+export type CharacterType = "bud" | "ramen";
+
 interface BudgetData {
   categoryName: string;
   monthlyBudget: number;
   transactions: Transaction[];
   isSetup: boolean;
+  selectedCharacter: CharacterType;
 }
 
 interface BudgetContextType {
   budgetData: BudgetData;
   addTransaction: (transaction: Omit<Transaction, "id">) => void;
   deleteTransaction: (id: string) => void;
-  setupBudget: (categoryName: string, monthlyBudget: number) => void;
+  setupBudget: (categoryName: string, monthlyBudget: number, character: CharacterType) => void;
+  resetBudget: () => Promise<void>;
   totalSpent: number;
   remaining: number;
   spendingPercentage: number;
@@ -35,6 +39,7 @@ const defaultBudgetData: BudgetData = {
   monthlyBudget: 0,
   transactions: [],
   isSetup: false,
+  selectedCharacter: "bud",
 };
 
 interface BudgetProviderProps {
@@ -69,6 +74,9 @@ export function BudgetProvider({ children }: BudgetProviderProps) {
           monthlyBudget: typeof parsed.monthlyBudget === 'number' ? parsed.monthlyBudget : 0,
           transactions: Array.isArray(parsed.transactions) ? parsed.transactions : [],
           isSetup: parsed.isSetup === true, // Strict boolean check
+          selectedCharacter: (parsed.selectedCharacter === "bud" || parsed.selectedCharacter === "ramen")
+            ? parsed.selectedCharacter
+            : "bud",
         };
 
         setBudgetData(validatedData);
@@ -108,13 +116,23 @@ export function BudgetProvider({ children }: BudgetProviderProps) {
     }));
   };
 
-  const setupBudget = (categoryName: string, monthlyBudget: number) => {
+  const setupBudget = (categoryName: string, monthlyBudget: number, character: CharacterType) => {
     setBudgetData((prev) => ({
       ...prev,
       categoryName,
       monthlyBudget,
+      selectedCharacter: character,
       isSetup: true,
     }));
+  };
+
+  const resetBudget = async () => {
+    try {
+      await AsyncStorage.removeItem(STORAGE_KEY);
+      setBudgetData(defaultBudgetData);
+    } catch (error) {
+      console.error("Error resetting budget:", error);
+    }
   };
 
   const totalSpent = budgetData.transactions.reduce(
@@ -133,6 +151,7 @@ export function BudgetProvider({ children }: BudgetProviderProps) {
         addTransaction,
         deleteTransaction,
         setupBudget,
+        resetBudget,
         totalSpent,
         remaining,
         spendingPercentage,

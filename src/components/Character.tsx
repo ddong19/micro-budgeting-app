@@ -1,8 +1,10 @@
 import React from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
+import { CharacterType } from "../context/BudgetContext";
 
 interface CharacterProps {
   spendingPercentage: number;
+  characterType: CharacterType;
 }
 
 type CharacterState = "thriving" | "happy" | "nervous" | "worried" | "stressed" | "ruined";
@@ -16,30 +18,53 @@ function getCharacterState(percentage: number): CharacterState {
   return "ruined";                          // 100%+ spent (over budget)
 }
 
-function getMicrocopy(state: CharacterState): string {
-  const messages = {
-    thriving: "Thriving! You're crushing it! 🌱",
-    happy: "Looking healthy and happy! 😊",
-    nervous: "Getting a little thirsty... 💧",
-    worried: "Things are looking rough... 😰",
-    stressed: "Struggling to survive! 😫",
-    ruined: "Oh no! Completely wilted! 💀",
-  };
-  return messages[state];
+function getMicrocopy(state: CharacterState, characterType: CharacterType): string {
+  if (characterType === "bud") {
+    const messages = {
+      thriving: "Thriving! You're crushing it! 🌱",
+      happy: "Looking healthy and happy! 😊",
+      nervous: "Getting a little thirsty... 💧",
+      worried: "Things are looking rough... 😰",
+      stressed: "Struggling to survive! 😫",
+      ruined: "Oh no! Completely wilted! 💀",
+    };
+    return messages[state];
+  } else {
+    // Ramen character messages
+    const messages = {
+      thriving: "Piping hot and perfect! 🍜",
+      happy: "Still steaming nicely! 😊",
+      nervous: "Getting a bit lukewarm... 💧",
+      worried: "Starting to get cold... 😰",
+      stressed: "Almost gone cold! 😫",
+      ruined: "Stone cold and soggy! 💀",
+    };
+    return messages[state];
+  }
 }
 
 // Import character images
-const characterImages = {
-  thriving: require('../../assets/characters/Stage_1.png'),
-  happy: require('../../assets/characters/Stage_2.png'),
-  nervous: require('../../assets/characters/Stage_3.png'),
-  worried: require('../../assets/characters/Stage_4.png'),
-  stressed: require('../../assets/characters/Stage_5.png'),
-  ruined: require('../../assets/characters/Stage_6.png'),
+const budImages = {
+  thriving: require('../../assets/characters/bud/Stage_1.png'),
+  happy: require('../../assets/characters/bud/Stage_2.png'),
+  nervous: require('../../assets/characters/bud/Stage_3.png'),
+  worried: require('../../assets/characters/bud/Stage_4.png'),
+  stressed: require('../../assets/characters/bud/Stage_5.png'),
+  ruined: require('../../assets/characters/bud/Stage_6.png'),
 };
 
-export default function Character({ spendingPercentage }: CharacterProps) {
+const ramenImages = {
+  thriving: require('../../assets/characters/ramen/Stage_1.png'),
+  happy: require('../../assets/characters/ramen/Stage_2.png'),
+  nervous: require('../../assets/characters/ramen/Stage_3.png'),
+  worried: require('../../assets/characters/ramen/Stage_4.png'),
+  stressed: require('../../assets/characters/ramen/Stage_5.png'),
+  ruined: require('../../assets/characters/ramen/Stage_6.png'),
+};
+
+export default function Character({ spendingPercentage, characterType }: CharacterProps) {
   const state = getCharacterState(spendingPercentage);
+  const characterImages = characterType === "bud" ? budImages : ramenImages;
 
   return (
     <View style={styles.container}>
@@ -50,7 +75,7 @@ export default function Character({ spendingPercentage }: CharacterProps) {
           resizeMode="contain"
         />
       </View>
-      <Text style={styles.microcopy}>{getMicrocopy(state)}</Text>
+      <Text style={styles.microcopy}>{getMicrocopy(state, characterType)}</Text>
     </View>
   );
 }

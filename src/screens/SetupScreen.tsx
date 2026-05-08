@@ -9,9 +9,10 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useBudget } from "../context/BudgetContext";
+import { useBudget, CharacterType } from "../context/BudgetContext";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
+import CharacterCarousel from "../components/CharacterCarousel";
 
 type RootStackParamList = {
   Home: undefined;
@@ -25,11 +26,12 @@ type Props = NativeStackScreenProps<RootStackParamList, "Setup">;
 export default function SetupScreen({ navigation }: Props) {
   const [categoryName, setCategoryName] = useState("");
   const [monthlyBudget, setMonthlyBudget] = useState("");
+  const [selectedCharacter, setSelectedCharacter] = useState<CharacterType>("bud");
   const { setupBudget } = useBudget();
 
   const handleSubmit = () => {
     if (categoryName && monthlyBudget) {
-      setupBudget(categoryName, parseFloat(monthlyBudget));
+      setupBudget(categoryName, parseFloat(monthlyBudget), selectedCharacter);
       navigation.replace("Home");
     }
   };
@@ -40,56 +42,59 @@ export default function SetupScreen({ navigation }: Props) {
         style={styles.container}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-      <ScrollView
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.header}>
-          <Text style={styles.emoji}>😊</Text>
-          <Text style={styles.title}>Meet Your Budget Bud</Text>
-          <Text style={styles.subtitle}>
-            The more you spend, the sadder they get
-          </Text>
-        </View>
+        <ScrollView
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.header}>
+            <Text style={styles.welcome}>Welcome! 👋</Text>
+            <Text style={styles.title}>Let's Start Your</Text>
+            <Text style={styles.titleAccent}>Budget Journey!</Text>
+            <Text style={styles.subtitle}>
+              Pick a buddy to help you track your spending
+            </Text>
+          </View>
 
-        <View style={styles.previewContainer}>
-          <View style={styles.previewItem}>
-            <Text style={styles.previewEmoji}>😊</Text>
-            <Text style={styles.previewLabel}>Under budget</Text>
-          </View>
-          <View style={styles.previewItem}>
-            <Text style={styles.previewEmoji}>😰</Text>
-            <Text style={styles.previewLabel}>Getting close</Text>
-          </View>
-          <View style={styles.previewItem}>
-            <Text style={styles.previewEmoji}>💀</Text>
-            <Text style={styles.previewLabel}>Uh oh...</Text>
-          </View>
-        </View>
-
-        <View style={styles.form}>
-          <Input
-            label="Pick a category"
-            value={categoryName}
-            onChangeText={setCategoryName}
-            placeholder="Eating Out"
-            autoCapitalize="words"
+          <CharacterCarousel
+            onSelectCharacter={setSelectedCharacter}
+            selectedCharacter={selectedCharacter}
           />
 
-          <Input
-            label="Set a monthly limit"
-            value={monthlyBudget}
-            onChangeText={setMonthlyBudget}
-            placeholder="300"
-            keyboardType="decimal-pad"
-            prefix="$"
-          />
+          <View style={styles.form}>
+            <View style={styles.formHeader}>
+              <Text style={styles.formTitle}>Set Up Your Budget</Text>
+              <Text style={styles.formSubtitle}>
+                Track one category at a time
+              </Text>
+            </View>
 
-          <Button onPress={handleSubmit} size="lg" style={styles.button}>
-            Get Started!
-          </Button>
-        </View>
-      </ScrollView>
+            <Input
+              label="What are you budgeting for?"
+              value={categoryName}
+              onChangeText={setCategoryName}
+              placeholder="Eating Out, Coffee, Shopping..."
+              autoCapitalize="words"
+            />
+
+            <Input
+              label="Monthly budget limit"
+              value={monthlyBudget}
+              onChangeText={setMonthlyBudget}
+              placeholder="300"
+              keyboardType="decimal-pad"
+              prefix="$"
+            />
+
+            <Button onPress={handleSubmit} size="lg" style={styles.button}>
+              Start Tracking! 🚀
+            </Button>
+
+            <Text style={styles.disclaimer}>
+              Your buddy will change based on how much you spend!
+            </Text>
+          </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -98,7 +103,7 @@ export default function SetupScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#fdfeff",
   },
   container: {
     flex: 1,
@@ -106,47 +111,62 @@ const styles = StyleSheet.create({
   content: {
     flexGrow: 1,
     padding: 24,
-    justifyContent: "center",
+    paddingTop: 12,
   },
   header: {
     alignItems: "center",
-    marginBottom: 24,
+    marginBottom: 32,
   },
-  emoji: {
-    fontSize: 96,
-    marginBottom: 24,
+  welcome: {
+    fontSize: 18,
+    color: "#6b7280",
+    marginBottom: 8,
   },
   title: {
-    fontSize: 24,
-    fontWeight: "700",
+    fontSize: 32,
+    fontWeight: "800",
     color: "#1f2937",
+    textAlign: "center",
+  },
+  titleAccent: {
+    fontSize: 32,
+    fontWeight: "800",
+    color: "#14b8a6",
+    textAlign: "center",
     marginBottom: 12,
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: 16,
     color: "#6b7280",
     textAlign: "center",
-  },
-  previewContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 40,
-  },
-  previewItem: {
-    alignItems: "center",
-  },
-  previewEmoji: {
-    fontSize: 48,
-    marginBottom: 8,
-  },
-  previewLabel: {
-    fontSize: 12,
-    color: "#6b7280",
+    lineHeight: 22,
   },
   form: {
     gap: 20,
+    marginTop: 16,
+  },
+  formHeader: {
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  formTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#1f2937",
+    marginBottom: 4,
+  },
+  formSubtitle: {
+    fontSize: 14,
+    color: "#9ca3af",
   },
   button: {
     marginTop: 8,
+  },
+  disclaimer: {
+    fontSize: 13,
+    color: "#9ca3af",
+    textAlign: "center",
+    marginTop: 4,
+    fontStyle: "italic",
   },
 });

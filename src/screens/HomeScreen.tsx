@@ -24,7 +24,12 @@ type RootStackParamList = {
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
 export default function HomeScreen({ navigation }: Props) {
-  const { budgetData, totalSpent, remaining, spendingPercentage, isLoading } = useBudget();
+  const { budgetData, totalSpent, remaining, spendingPercentage, isLoading, resetBudget } = useBudget();
+
+  const handleReset = async () => {
+    await resetBudget();
+    navigation.replace("Setup");
+  };
 
   useEffect(() => {
     if (!isLoading && !budgetData.isSetup) {
@@ -40,8 +45,13 @@ export default function HomeScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={handleReset} style={styles.resetButton}>
+          <Text style={styles.resetButtonText}>↻ Reset</Text>
+        </TouchableOpacity>
+      </View>
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        <Character spendingPercentage={spendingPercentage} />
+        <Character spendingPercentage={spendingPercentage} characterType={budgetData.selectedCharacter} />
 
       <Card style={styles.card}>
         <Text style={styles.categoryName}>{budgetData.categoryName}</Text>
@@ -129,6 +139,26 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#fff",
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    paddingHorizontal: 24,
+    paddingTop: 8,
+    paddingBottom: 8,
+  },
+  resetButton: {
+    backgroundColor: "#fef2f2",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#fecaca",
+  },
+  resetButtonText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#ef4444",
   },
   container: {
     flex: 1,
